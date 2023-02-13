@@ -2,7 +2,9 @@
 
 Very messy at the mo. classes all over the shop - needs a good refactor.
 
-### Dependencies ( defined in the `pom.xml` )
+Built with Spigot v1.19.3
+
+### Build Dependencies ( defined in the `pom.xml` )
 - WorldEdit
 - WorldGuard
 - Vault
