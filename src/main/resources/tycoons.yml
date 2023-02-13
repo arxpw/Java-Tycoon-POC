@@ -1,0 +1,13 @@
+tycoons:
+  1104b9e3-4bbf-41db-84a3-f5b5a2018699:
+    location:
+       direction: -90
+       x: -9999999.0
+       y: 3.0
+       z: -600000.0
+       world: WORLD
+    created: 2019/09/01 06:18:51
+    buildings:
+       farm: false
+       mineshaft: false
+       farmcrate: false

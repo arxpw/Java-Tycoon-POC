@@ -1,0 +1,8 @@
+name: Tycoon
+version: '${project.version}'
+main: pw.arx.tycoonplugin.Tycoon
+api-version: 1.19
+depend: [HolographicDisplays, WorldEdit, WorldGuard, Vault]
+commands:
+  tycoon:
+    description: Allows you to begin creating a tycoon

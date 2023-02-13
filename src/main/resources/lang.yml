@@ -1,0 +1,13 @@
+NO_PERMISSION: "&cYou don't have permission to do this."
+INVALID_COMMAND: "&cInvalid command, please do /tycoon to see all commands."
+RELOADED: "&fPlugin &areloaded&f."
+LAND_VALID_SELECT: "&fLand is valid. &eLeft Click the gold block to confirm."
+LAND_VALID: "&fThis land is valid! "
+LAND_VALID_LINK: "&e&lClick here to create"
+COMMANDS_TITLE: "&e&lTycoon"
+NO_CONSOLE: "You must be a player to run this command"
+COMMANDS:
+- "/tycoon &etool &7- Enable and disable your tycoon builder tool."
+- "/tycoon &ebuild &7- Build tycoon structures."
+- "/tycoon &eprestige&7- Prestige your tycoon."
+- "/tycoon &edelete&7- Delete your tycoon."
