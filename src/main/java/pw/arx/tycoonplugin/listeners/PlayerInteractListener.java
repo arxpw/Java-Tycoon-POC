@@ -29,18 +29,7 @@ import java.util.UUID;
 public class PlayerInteractListener implements Listener {
 	
 	FileConfiguration config = Tycoon.getPlugin().getConfig();
-	
-	@EventHandler
-	public void onTrampleFarmland(PlayerInteractEvent event) {
-		
-	    if(event.getAction() == Action.PHYSICAL)
-	    	if(event.hasBlock())
-	    		if(event.getClickedBlock().getType() == Material.FARMLAND)
-	    			event.setCancelled(true);
-	    
-	    return;
-	}
-	
+
 	Action[] ListenerActions = { 
 		Action.RIGHT_CLICK_BLOCK,
 		Action.RIGHT_CLICK_AIR,
@@ -62,16 +51,18 @@ public class PlayerInteractListener implements Listener {
 	
 	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void onPlayerClick(PlayerInteractEvent event) {
-		
-    	if(!Arrays.stream(ListenerActions).anyMatch(event.getAction()::equals))
+	public void onPlayerClick(PlayerInteractEvent event)
+	{
+    	if (!Arrays.stream(ListenerActions).anyMatch(event.getAction()::equals)) {
 			return;
+		}
 	    
        	EquipmentSlot e = event.getHand();
-    	if(e.equals(EquipmentSlot.HAND) != true)
-    		return;
+    	if (!e.equals(EquipmentSlot.HAND)) {
+			return;
+		}
     	
-	    if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+	    if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 	    	
 	    	if(event.getClickedBlock().getType().equals(Material.PLAYER_HEAD)) {
 	        	if(TycoonManager.hasTycoon(event.getPlayer())) {
@@ -126,8 +117,9 @@ public class PlayerInteractListener implements Listener {
 	    	}
 	    }
 
-    	if(!event.getPlayer().getItemInHand().equals(ItemUtils.LandSelector(true))) 
-    		return;
+    	if (!event.getPlayer().getItemInHand().equals(ItemUtils.LandSelector(true))) {
+			return;
+		}
 
 		Player p = event.getPlayer();
 		Block tblock = BlockUtils.targetBlock(p);
@@ -178,34 +170,28 @@ public class PlayerInteractListener implements Listener {
     	HashMap<UUID, Location> SEL_HASHMAP = Tycoon.SELECTION_LOCATIONS;
         
     	// clear
-    	if(Arrays.stream(SelectorActionClear).anyMatch(event.getAction()::equals)) {
-    		
-			if(SEL_HASHMAP.containsKey(p.getUniqueId())) {
+    	if (Arrays.stream(SelectorActionClear).anyMatch(event.getAction()::equals)) {
+			if (SEL_HASHMAP.containsKey(p.getUniqueId())) {
 				// UPDATE BLOCKS...                
-                if(TycoonSelector.ClearSelection(p) == true) {
+                if (TycoonSelector.ClearSelection(p)) {
                 	p.sendMessage(StringUtils.c("Land selection &bcleared&r!"));
                 }
 			} else {
 				p.sendMessage(StringUtils.c("&cYou don't have any land selected!"));
 			}
-    		
     	} 
     	
     	// right clicking / create selection
     	if(Arrays.stream(SelectorActionCreate).anyMatch(event.getAction()::equals)) {
 
     		// player has an existing selection?
-    		if(SEL_HASHMAP.containsKey(p.getUniqueId())) {
-    			
+    		if (SEL_HASHMAP.containsKey(p.getUniqueId())) {
 				// UPDATE OLD BLOCKS...
                 ArrayList<Location> OLD_SELECTION = LocUtils.selectOffset(SEL_HASHMAP.get(p.getUniqueId()), Tycoon.SEL_OFFSET);
                 BlockUtils.blockUpdate(OLD_SELECTION.get(0), OLD_SELECTION.get(1), p);
-                
-				TycoonSelector.SelectBlocks(p);
-    		} else {
-    			// if player does NOT have an existing selection
-    			TycoonSelector.SelectBlocks(p);
-    		}
-    	}
+			}
+
+			TycoonSelector.SelectBlocks(p);
+		}
     }
 }
