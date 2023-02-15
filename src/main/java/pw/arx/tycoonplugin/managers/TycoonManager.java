@@ -32,23 +32,6 @@ public class TycoonManager {
 		return exists;
 	}
 	
-	public static Location getTycoonHome(Player p) {
-		Config tycoons = Tycoon.fileManager.getConfig("tycoons.yml");
-		World tycoonWorld = Bukkit.getWorld(tycoons.get("tycoons." + p.getUniqueId().toString() + ".location.world").toString());
-		String locString = "tycoons." + p.getUniqueId().toString() + ".clickers.owner.location";
-		
-		Location l = new Location(
-			tycoonWorld,
-			Double.parseDouble(tycoons.get(locString + ".x").toString()),
-			Double.parseDouble(tycoons.get(locString + ".y").toString()),
-			Double.parseDouble(tycoons.get(locString + ".z").toString()),
-			p.getLocation().getYaw(),
-			p.getLocation().getPitch()
-		);
-		
-		return l;
-	}
-	
 	public static ConfigurationSection getTycoonBuildings(Player p) {
 		Config tycoons = Tycoon.fileManager.getConfig("tycoons.yml");
 		ConfigurationSection keys = tycoons.getConfigurationSection("tycoons." + p.getUniqueId().toString() + ".buildings");
