@@ -54,43 +54,41 @@ public class TycoonManager {
 		ConfigurationSection keys = tycoons.getConfigurationSection("tycoons." + p.getUniqueId().toString() + ".buildings");
 		return keys;
 	}
-	
-	
+
 	public static void addTycoonGains() {
 		Config tycoons = Tycoon.fileManager.getConfig("tycoons.yml");
+
 		for(String tycoon_single : tycoons.getConfigurationSection("tycoons").getKeys(false)) {
 			ConfigurationSection buildings = tycoons.getConfigurationSection("tycoons." + tycoon_single + ".buildings");
 			double totalToAdd = 0.00;
-			
-			if(buildings != null) {
-				
-				for(String building : buildings.getKeys(true)) {
-					
-					if(building.contains("crate")) {
-						continue;
-					}
-					
-					ConfigurationSection cfgs = TycoonManager.getTycoon(tycoon_single);
-					Double multiplier = cfgs.getDouble("buildings." + building + ".multiplier");
 
-					if(multiplier > 0) {
-						totalToAdd = totalToAdd + multiplier;
-					}
+			if (buildings == null) {
+				return;
+			}
+
+			for(String building : buildings.getKeys(true)) {
+				if (building.contains("crate")) {
+					continue;
 				}
-				
-				for(Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
-					
-					if(!onlinePlayer.getUniqueId().toString().equals(tycoon_single)) {
-						continue;
-					}
-					
-					if(totalToAdd > 0) {
-						Tycoon.getEconomy().depositPlayer(onlinePlayer, totalToAdd);
-						onlinePlayer.sendMessage(StringUtils.c("&rYour tycoon has generated &a$" + totalToAdd + "!"));
-					} else {
-						// let's not spam players who don't earn any money
-						// onlinePlayer.sendMessage(StringUtils.c("&rYour tycoon has generated &cno income at this time."));
-					}
+
+				ConfigurationSection cfgs = TycoonManager.getTycoon(tycoon_single);
+				double multiplier = cfgs.getDouble("buildings." + building + ".multiplier");
+
+				if (multiplier > 0) {
+					totalToAdd = totalToAdd + multiplier;
+				}
+			}
+
+			for(Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
+				// let's not spam players who don't have a tycoon
+				if (!onlinePlayer.getUniqueId().toString().equals(tycoon_single)) {
+					continue;
+				}
+
+				// let's not spam players who don't earn any money
+				if(totalToAdd > 0) {
+					Tycoon.getEconomy().depositPlayer(onlinePlayer, totalToAdd);
+					onlinePlayer.sendMessage(StringUtils.c("&rYour tycoon has generated &a$" + totalToAdd + "!"));
 				}
 			}
 		}
@@ -100,8 +98,7 @@ public class TycoonManager {
 		ConfigurationSection player = getTycoonBuildings(p);
 		for(String build : player.getKeys(true)) {
 			// we only want existing buildings
-//			Bukkit.broadcastMessage(build);
-			if(player.isBoolean(build) == false) {
+			if(!player.isBoolean(build)) {
 				ConfigurationSection cs = TycoonManager.getTycoon(p.getUniqueId().toString());
 				Location clickerLocation = new Location(
 						Bukkit.getWorld(cs.get("location.world").toString()),
@@ -112,38 +109,13 @@ public class TycoonManager {
 				
 				if(l.distance(clickerLocation) < 1) {
 					return build;
-				} else {
-//					Bukkit.broadcastMessage("d: " + l.distance(clickerLocation));
 				}
 			}
-			
 		}
+
 		return null;
 	}
-	
-	public static Boolean locationIsBuilding(Player p, Location l) {
-		ConfigurationSection player = getTycoonBuildings(p);
-		for(String build : player.getKeys(true)) {
-			
-			// we only want existing buildings
-			if(player.isBoolean(build) == false) {
-				ConfigurationSection cs = TycoonManager.getTycoon(p.getUniqueId().toString());
-				Location clickerLocation = new Location(
-						Bukkit.getWorld(cs.get("location.world").toString()),
-						cs.getDouble("clickers." + build + ".location.x"),
-						cs.getDouble("clickers." + build + ".location.y"),
-						cs.getDouble("clickers." + build + ".location.z")
-				);
-				
-				if(l.distance(clickerLocation) < 1) {
-					return true;
-				}
-			}
-			
-		}
-		return false;
-	}
-	
+
 	public static void spawnTycoon(Location l, Player p) throws FileNotFoundException {
 		String UUID = p.getUniqueId().toString();
 		Config tycoons = Tycoon.fileManager.getConfig("tycoons.yml");
@@ -209,7 +181,7 @@ public class TycoonManager {
 		// clear items
 		List<Entity> Entities = blockLocation.getWorld().getEntities();
 		
-		for(Entity current : Entities) {
+		for (Entity current : Entities) {
 			if (current.getType() != EntityType.DROPPED_ITEM) {
 				continue;
 			}
@@ -233,45 +205,40 @@ public class TycoonManager {
 	}
 
 	public static Location getTycoonLocation(String UUID) {
-				
 		Config tycoons = Tycoon.fileManager.getConfig("tycoons.yml");
 		ConfigurationSection t = tycoons.getConfigurationSection("tycoons");
 		
-		Double x = t.getDouble(UUID + ".location.x");
-		Double y = t.getDouble(UUID + ".location.y");
-		Double z = t.getDouble(UUID + ".location.z");
+		double x = t.getDouble(UUID + ".location.x");
+		double y = t.getDouble(UUID + ".location.y");
+		double z = t.getDouble(UUID + ".location.z");
 		
 		World world = Bukkit.getWorld(t.getString(UUID + ".location.world"));
-		
-		Location generated = new Location(world, x,y,z);
-		return generated; 
+
+		return new Location(world, x,y,z);
 	}
 	
 	public static ConfigurationSection getTycoon(String UUID) {
-
 		Config tycoons = Tycoon.fileManager.getConfig("tycoons.yml");
 		ConfigurationSection t = tycoons.getConfigurationSection("tycoons");
 		return t.getConfigurationSection(UUID);
-		
 	}
 	
 	
 	public static Double getTycoonDirection(String UUID) {		
 		Config tycoons = Tycoon.fileManager.getConfig("tycoons.yml");
 		ConfigurationSection t = tycoons.getConfigurationSection("tycoons");
-	
-		Double direction = t.getDouble(UUID + ".location.direction");
-		return direction; 
+
+		return t.getDouble(UUID + ".location.direction");
 	}
 
 	
 	public static Boolean canPlaceTycoon(Location l) {
-		Boolean canPlace = true;
+		boolean canPlace = true;
 		Config tycoons = Tycoon.fileManager.getConfig("tycoons.yml");
 		ConfigurationSection t = tycoons.getConfigurationSection("tycoons");
 		
 		for(String loc : t.getKeys(false)) {
-			if(PlayerUtils.validUUID(loc) == true) {
+			if(PlayerUtils.validUUID(loc)) {
 				if(l.distance(getTycoonLocation(loc)) < Tycoon.SEL_RADIUS) {
 					canPlace = false;
 					break;

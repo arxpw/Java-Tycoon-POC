@@ -83,7 +83,7 @@ public class MenuUtils {
 	}
 	
 	public static Inventory TycoonMenu() {
-		Inventory inv = FILLBG("GREG");
+		Inventory inv = FILLBG("Tycoon Upgrades");
 		
 		inv.setItem(10, GenItem("BRICKS", "&c&lTycoon Buildings", SingleLoreArray("&7/tycoon buildings")));
 		inv.setItem(12, GenItem("GOLD_BLOCK", "&6&lTycoon General", SingleLoreArray("&7/tycoon general")));

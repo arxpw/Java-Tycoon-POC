@@ -105,22 +105,19 @@ public class PlayerInteractListener implements Listener {
 	    	
 	    	if(event.getClickedBlock().getType().equals(Material.BARREL)) {
 	    		String activeBlock = TycoonManager.getBuildingByLocation(event.getPlayer(), event.getClickedBlock().getLocation().add(0,1,0));
-//	    		Bukkit.broadcastMessage(activeBlock);
+
 	    		if(activeBlock != null) {
 	    			event.setCancelled(true);
 	    			event.getPlayer().openInventory(MenuUtils.buildingUpgrader(activeBlock, event.getPlayer()));
-	    			// event.getPlayer().sendMessage(activeBlock);
 	    		}
-	    		
 	    	}
 	    }
 	    
 	    if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
 	    	if(event.getClickedBlock().getType().equals(Material.BARREL)) {
 	    		String activeBlock = TycoonManager.getBuildingByLocation(event.getPlayer(), event.getClickedBlock().getLocation().add(0,1,0));
-//	    		Bukkit.broadcastMessage(activeBlock);
+
 	    		if(activeBlock.contains("crate")) {
-	    			
 	    			if(cratedown.isOnCooldown(event.getPlayer()) == false) {
 	    				BuildingManager.buildingClicker(activeBlock, event.getPlayer());
 	    				cratedown.setCooldown(event.getPlayer());
