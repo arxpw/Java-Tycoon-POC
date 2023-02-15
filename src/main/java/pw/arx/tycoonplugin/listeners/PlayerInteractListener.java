@@ -16,7 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import pw.arx.tycoonplugin.Tycoon;
-import pw.arx.tycoonplugin.commands.Create;
+import pw.arx.tycoonplugin.commandhandlers.CreateCommandHandler;
 import pw.arx.tycoonplugin.managers.BuildingManager;
 import pw.arx.tycoonplugin.managers.TycoonManager;
 import pw.arx.tycoonplugin.utils.*;
@@ -58,15 +58,16 @@ public class PlayerInteractListener implements Listener {
 		}
 	    
        	EquipmentSlot e = event.getHand();
-    	if (!e.equals(EquipmentSlot.HAND)) {
+
+    	if (e == null || !e.equals(EquipmentSlot.HAND)) {
 			return;
 		}
     	
 	    if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 	    	
-	    	if(event.getClickedBlock().getType().equals(Material.PLAYER_HEAD)) {
-	        	if(TycoonManager.hasTycoon(event.getPlayer())) {
-	        		if(WorldEditUtils.playerInsideTheirRegion(event.getPlayer())) {
+	    	if (event.getClickedBlock().getType().equals(Material.PLAYER_HEAD)) {
+	        	if (TycoonManager.hasTycoon(event.getPlayer())) {
+	        		if (WorldEditUtils.playerInsideTheirRegion(event.getPlayer())) {
 	        			
 	        			for(Hologram holo : HolographicDisplaysAPI.get(Tycoon.getPlugin()).getHolograms()) {
 							String worldName = holo.getPosition().getWorldName();
@@ -74,18 +75,22 @@ public class PlayerInteractListener implements Listener {
 
 							String blockWorldName = block.getWorld().getName();
 
-	        				if(blockWorldName.equals(worldName)) {
-	        					if(holo.getPosition().distance(block.getLocation()) < 2) {
-	        						HologramLine tl = holo.getLines().get(0);
-	        						TextHologramLine ctl = (TextHologramLine) tl;
+							if (!blockWorldName.equals(worldName)) {
+								return;
+							}
 
-	        						boolean buyer = ctl.getText().contains("BUILDING");
-	        						
-	        						if (buyer) {
-										event.getPlayer().openInventory(MenuUtils.LoadMenuFromConfig("buildings", event.getPlayer()));
-									}
-	        					}
-	        				}
+							if (holo.getPosition().distance(block.getLocation()) > 2) {
+								return;
+							}
+
+							HologramLine tl = holo.getLines().get(0);
+							TextHologramLine ctl = (TextHologramLine) tl;
+
+							boolean buyer = ctl.getText().contains("BUILDING");
+
+							if (buyer) {
+								event.getPlayer().openInventory(MenuUtils.LoadBuildingsMenu(event.getPlayer()));
+							}
 	        			}
 	        		} else {
 	        			event.getPlayer().sendMessage("This isn't your tycoon!");
@@ -94,22 +99,22 @@ public class PlayerInteractListener implements Listener {
 	        	return;
 	    	}
 	    	
-	    	if(event.getClickedBlock().getType().equals(Material.BARREL)) {
+	    	if (event.getClickedBlock().getType().equals(Material.BARREL)) {
 	    		String activeBlock = TycoonManager.getBuildingByLocation(event.getPlayer(), event.getClickedBlock().getLocation().add(0,1,0));
 
-	    		if(activeBlock != null) {
+	    		if (activeBlock != null) {
 	    			event.setCancelled(true);
-	    			event.getPlayer().openInventory(MenuUtils.buildingUpgrader(activeBlock, event.getPlayer()));
+	    			event.getPlayer().openInventory(MenuUtils.getBuildingUpgraderInventory(activeBlock, event.getPlayer()));
 	    		}
 	    	}
 	    }
 	    
-	    if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
-	    	if(event.getClickedBlock().getType().equals(Material.BARREL)) {
+	    if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+	    	if (event.getClickedBlock().getType().equals(Material.BARREL)) {
 	    		String activeBlock = TycoonManager.getBuildingByLocation(event.getPlayer(), event.getClickedBlock().getLocation().add(0,1,0));
 
-	    		if(activeBlock.contains("crate")) {
-	    			if(cratedown.isOnCooldown(event.getPlayer()) == false) {
+	    		if (activeBlock.contains("crate")) {
+	    			if (cratedown.isOnCooldown(event.getPlayer()) == false) {
 	    				BuildingManager.buildingClicker(activeBlock, event.getPlayer());
 	    				cratedown.setCooldown(event.getPlayer());
 	    			}
@@ -126,39 +131,39 @@ public class PlayerInteractListener implements Listener {
 		event.setCancelled(true);
 		
 		// create actions, already selected?
-		if(Arrays.stream(SelectorActionCreate).anyMatch(event.getAction()::equals)) {
+		if (Arrays.stream(SelectorActionCreate).anyMatch(event.getAction()::equals)) {
 			
-			if(TycoonManager.hasTycoon(p)) {
+			if (TycoonManager.hasTycoon(p)) {
 				p.sendMessage(StringUtils.c("&cYou already have a tycoon! Delete this before making a new one with /tycoon delete"));
 				return;				
 			}
 			
-			if(TycoonManager.canPlaceTycoon(tblock.getLocation()) == false) {
+			if (TycoonManager.canPlaceTycoon(tblock.getLocation()) == false) {
 				p.sendMessage(StringUtils.c("&cAnother Tycoon is already too close!"));
 				return;
 			}
 			
 			// does the selection contain a player?
-			if(Tycoon.SELECTION_LOCATIONS.containsKey(event.getPlayer().getUniqueId())) {
+			if (Tycoon.SELECTION_LOCATIONS.containsKey(event.getPlayer().getUniqueId())) {
 				
 				Location SELECTED = Tycoon.SELECTION_LOCATIONS.get(p.getUniqueId());
 				ArrayList<Location> INSIDECUBELOC = LocUtils.selectOffset(SELECTED, Tycoon.SEL_OFFSET);
 				Boolean BLOCK_INSIDE = BlockUtils.insideCuboid(tblock.getLocation(), INSIDECUBELOC.get(0), INSIDECUBELOC.get(1));
 				
-				if(BLOCK_INSIDE) {
+				if (BLOCK_INSIDE) {
 					// is the player updating a block on their client side?
 					// will need to update this back to the selection.
 					
                 	Bukkit.getScheduler().scheduleSyncDelayedTask(Tycoon.getPlugin(), new Runnable() {
                         public void run() {
-        					if(tblock.equals(SELECTED.getBlock())) {
+        					if (tblock.equals(SELECTED.getBlock())) {
         						p.sendBlockChange(tblock.getLocation(), Material.GOLD_BLOCK.createBlockData());
         					}
                         }
                     }, 3);
 
-					if(tblock.equals(SELECTED.getBlock())) {
-						Create.Command(p);
+					if (tblock.equals(SELECTED.getBlock())) {
+						CreateCommandHandler.handle(p);
 					} else {
 						p.sendMessage(StringUtils.c("&cArea already selected!"));
 					}
@@ -182,7 +187,7 @@ public class PlayerInteractListener implements Listener {
     	} 
     	
     	// right clicking / create selection
-    	if(Arrays.stream(SelectorActionCreate).anyMatch(event.getAction()::equals)) {
+    	if (Arrays.stream(SelectorActionCreate).anyMatch(event.getAction()::equals)) {
 
     		// player has an existing selection?
     		if (SEL_HASHMAP.containsKey(p.getUniqueId())) {

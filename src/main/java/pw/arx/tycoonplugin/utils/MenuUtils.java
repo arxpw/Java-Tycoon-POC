@@ -50,8 +50,9 @@ public class MenuUtils {
 		ItemStack return_stack = new ItemStack(mat);
 		ItemMeta meta = return_stack.getItemMeta();
 		
-		if(!lore.isEmpty() && lore.size() > 0)
+		if (!lore.isEmpty()) {
 			meta.setLore(lore);
+		}
 		
 		meta.setDisplayName(StringUtils.c(title));
 		meta.addEnchant(Enchantment.DURABILITY, 1, true);
@@ -66,10 +67,10 @@ public class MenuUtils {
 		return GenItem(item,title,lore);
 	}
 	
-	public static Inventory FILLBG(String menuTitle) {
+	public static Inventory CreateTemplateInventory(String menuTitle) {
 		Inventory inv = Bukkit.createInventory(null, TycoonMenuRows*9, menuTitle);
 		
-	    for(int i = 0; i < inv.getContents().length; i++) {
+	    for (int i = 0; i < inv.getContents().length; i++) {
 	    	inv.setItem(i, GenItem("BLACK_STAINED_GLASS_PANE"," "));
 	    }
 	    
@@ -83,7 +84,7 @@ public class MenuUtils {
 	}
 	
 	public static Inventory TycoonMenu() {
-		Inventory inv = FILLBG("Tycoon Upgrades");
+		Inventory inv = CreateTemplateInventory("Tycoon Upgrades");
 		
 		inv.setItem(10, GenItem("BRICKS", "&c&lTycoon Buildings", SingleLoreArray("&7/tycoon buildings")));
 		inv.setItem(12, GenItem("GOLD_BLOCK", "&6&lTycoon General", SingleLoreArray("&7/tycoon general")));
@@ -93,47 +94,44 @@ public class MenuUtils {
 		return inv;
 	}
 	
-	
 	public static String getBuildingsUpgraderMenuTitle() {
 		Config INV_CONFIG = Tycoon.fileManager.getConfig("buildings.yml");
 		return INV_CONFIG.get("upgrader_title").toString(); 
 	}
 	
-	public static Inventory buildingUpgrader(String building, Player p) {
+	public static Inventory getBuildingUpgraderInventory(String building, Player p)
+	{
+		Config allBuildingsConfig = Tycoon.fileManager.getConfig("buildings.yml");
+		ConfigurationSection buildingConfig = allBuildingsConfig.getConfigurationSection("buildings." + building);
 		
-		Config BUILDINGS_CONFIG = Tycoon.fileManager.getConfig("buildings.yml");
-		ConfigurationSection this_building = BUILDINGS_CONFIG.getConfigurationSection("buildings." + building);
+		Config playerTycoonConfig = Tycoon.fileManager.getConfig("tycoons.yml");
+		ConfigurationSection playerTycoonBuildingLevel = playerTycoonConfig.getConfigurationSection("tycoons." + p.getUniqueId().toString() + ".buildings." + building);
 		
-		Config PL_BUILDING_CONFIG = Tycoon.fileManager.getConfig("tycoons.yml");
-		ConfigurationSection player_building = PL_BUILDING_CONFIG.getConfigurationSection("tycoons." + p.getUniqueId().toString() + ".buildings." + building);
+		int currentBuildingLevel = playerTycoonBuildingLevel.getInt("level");
+		int maxBuildingLevel = buildingConfig.getList(".prices").size();
+		int nextBuildingLevel = currentBuildingLevel+1;
 		
-		Integer CURRENT_LEVEL = player_building.getInt("level");
-		Integer MAX_LEVEL = this_building.getList(".prices").size();
-		Integer NEXT_LEVEL = CURRENT_LEVEL+1;
-		
-		Double THIS_MULTIPLIER = Double.parseDouble(this_building.getList(".multipliers").get(CURRENT_LEVEL-1).toString());		
-		String formattedMultiplier = String.format("%.2f", THIS_MULTIPLIER);
+		double currentMultiplier = Double.parseDouble(buildingConfig.getList(".multipliers").get(currentBuildingLevel-1).toString());
+		String formattedMultiplier = String.format("%.2f", currentMultiplier);
 
-		
-		Inventory inv = FILLBG(getBuildingsUpgraderMenuTitle());
+		String upgraderTitle = allBuildingsConfig.get("upgrader_title").toString();
+
+		Inventory inv = CreateTemplateInventory(upgraderTitle);
 		
 		ArrayList<String> LORE = new ArrayList<String>();
-		
-		
-		if(CURRENT_LEVEL != MAX_LEVEL) {
-			Double NEXT_COST = Double.parseDouble(this_building.getStringList("prices").get(CURRENT_LEVEL).toString());
-			Double NEXT_MULTIPLIER = Double.parseDouble(this_building.getList(".multipliers").get(CURRENT_LEVEL).toString());
-			String formattedNextMultiplier = String.format("%.2f", NEXT_MULTIPLIER);
+
+		if (currentBuildingLevel != maxBuildingLevel) {
+			double nextUpgradeCost = Double.parseDouble(buildingConfig.getStringList("prices").get(currentBuildingLevel).toString());
+			double nextUpgradeMultiplier = Double.parseDouble(buildingConfig.getList(".multipliers").get(currentBuildingLevel).toString());
+			String formattedNextMultiplier = String.format("%.2f", nextUpgradeMultiplier);
 			
-			LORE.add(StringUtils.c("&e&lLevel " + NEXT_LEVEL));
+			LORE.add(StringUtils.c("&e&lLevel " + nextBuildingLevel));
 			LORE.add(StringUtils.c("&7" + formattedMultiplier + " &f> &e"+ formattedNextMultiplier));
-			LORE.add(StringUtils.c("&a$" + String.format("%.2f", NEXT_COST)));
-						
+			LORE.add(StringUtils.c("&a$" + String.format("%.2f", nextUpgradeCost)));
 		} else {
-			LORE.add(StringUtils.c("&7Fully Upgraded! " + MAX_LEVEL + "/" + MAX_LEVEL));
+			LORE.add(StringUtils.c("&7Fully Upgraded! " + maxBuildingLevel + "/" + maxBuildingLevel));
 		}
-		
-		
+
 		inv.setItem(13, GenItem("EMERALD_BLOCK", "&a&lUPGRADE " + building.toUpperCase(), LORE));
 		return inv;
 	}
@@ -142,40 +140,60 @@ public class MenuUtils {
 		Config INV_CONFIG = Tycoon.fileManager.getConfig("buildings.yml");
 		return INV_CONFIG.get("title").toString(); 
 	}
-	
-	public static Inventory LoadMenuFromConfig(String name, Player p) {
-		Config INV_CONFIG = Tycoon.fileManager.getConfig("buildings.yml");
-		
-		Inventory inv = FILLBG(getBuildingsMenuTitle());
-		ConfigurationSection items = INV_CONFIG.getConfigurationSection("buildings");
-		
+
+	public static Inventory LoadBuildingsMenu(Player p) {
+		Config buildingsConfig = Tycoon.fileManager.getConfig("buildings.yml");
+
+		Inventory inv = LoadInventoryFromConfig("buildings.yml");
+		ConfigurationSection items = buildingsConfig.getConfigurationSection("buildings");
+
 		for(String key : items.getKeys(false)) {
-		
+
 			boolean hasBuilding = BuildingManager.hasBuilding(p.getUniqueId().toString(), key);
-			
+
 			String MATERIAL = items.get(key + ".material").toString();
 			String TITLE = items.get(key + ".title").toString();
 			Integer SLOT = items.getInt(key + ".slot");
-			
-			ArrayList<String> LORE = new ArrayList<String>(); 
+
+			ArrayList<String> LORE = new ArrayList<String>();
+
 			for(String loreItem : (ArrayList<String>) items.getStringList(key + ".lore")) {
 				LORE.add(StringUtils.c(loreItem));
 			}
-			
-			if(hasBuilding == true) {
-//				Bukkit.broadcastMessage("hasbuilding: " + TITLE);
+
+			if (hasBuilding == true) {
 				String NEWTITLE = StringUtils.c("&c&l" + ChatColor.stripColor(StringUtils.c(TITLE)));
-				ArrayList<String> NEWLORE = new ArrayList<String>(); 
+				ArrayList<String> NEWLORE = new ArrayList<String>();
 				NEWLORE.add(StringUtils.c("&7Purchased"));
 				inv.setItem(SLOT, GenItem(MATERIAL, NEWTITLE, NEWLORE));
 			} else {
-//				Bukkit.broadcastMessage("does not have building: " + TITLE);
 				inv.setItem(SLOT, GenItem(MATERIAL, TITLE, LORE, true));
 			}
-
 		}
 
 		return inv;
 	}
 
+	public static Inventory LoadInventoryFromConfig(String name) {
+		Config INV_CONFIG = Tycoon.fileManager.getConfig(name);
+		
+		Inventory inv = CreateTemplateInventory(getBuildingsMenuTitle());
+		ConfigurationSection items = INV_CONFIG.getConfigurationSection("menu_items");
+		
+		for (String key : items.getKeys(false)) {
+			String MATERIAL = items.get(key + ".material").toString();
+			String TITLE = items.get(key + ".title").toString();
+			int SLOT = items.getInt(key + ".slot");
+			
+			ArrayList<String> LORE = new ArrayList<String>();
+
+			for (String loreItem : (ArrayList<String>) items.getStringList(key + ".lore")) {
+				LORE.add(StringUtils.c(loreItem));
+			}
+
+			inv.setItem(SLOT, GenItem(MATERIAL, TITLE, LORE, true));
+		}
+
+		return inv;
+	}
 }

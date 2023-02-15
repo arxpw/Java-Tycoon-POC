@@ -1,4 +1,4 @@
-package pw.arx.tycoonplugin.commands;
+package pw.arx.tycoonplugin.commandhandlers;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class Tool {
+public class ToolCommandHandler implements CommandHandler {
 	public static boolean Creator(Player p) {
 		HashMap<UUID, Boolean> h = Tycoon.TOOLS_ENABLED;
 		boolean FINAL_RETURN = false;

@@ -21,8 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
-
 
 public class TycoonManager {
 	
@@ -83,6 +81,7 @@ public class TycoonManager {
 			// we only want existing buildings
 			if(!player.isBoolean(build)) {
 				ConfigurationSection cs = TycoonManager.getTycoon(p.getUniqueId().toString());
+
 				Location clickerLocation = new Location(
 						Bukkit.getWorld(cs.get("location.world").toString()),
 						cs.getDouble("clickers." + build + ".location.x"),
@@ -205,15 +204,13 @@ public class TycoonManager {
 		ConfigurationSection t = tycoons.getConfigurationSection("tycoons");
 		return t.getConfigurationSection(UUID);
 	}
-	
-	
+
 	public static Double getTycoonDirection(String UUID) {		
 		Config tycoons = Tycoon.fileManager.getConfig("tycoons.yml");
 		ConfigurationSection t = tycoons.getConfigurationSection("tycoons");
 
 		return t.getDouble(UUID + ".location.direction");
 	}
-
 	
 	public static Boolean canPlaceTycoon(Location l) {
 		boolean canPlace = true;

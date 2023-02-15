@@ -1,10 +1,28 @@
 title: "Tycoon Buildings"
 upgrader_title: "Building Upgrader"
-buildings:
+
+menu_items:
    farm:
       slot: 10
       title: "&e&lFARM"
       material: "PUMPKIN"
+      lore:
+         - "&7Click to buy"
+   mineshaft:
+      slot: 12
+      title: "&a&lMINESHAFT"
+      material: "EMERALD_ORE"
+      lore:
+         - "&7Click to buy"
+   farmcrate:
+      slot: 14
+      title: "&e&lFARMCRATE"
+      material: "HAY_BLOCK"
+      lore:
+         - "&7Click to buy"
+
+buildings:
+   farm:
       prices:
          - 40
          - 85
@@ -27,12 +45,7 @@ buildings:
          - 99
          - 104
          - 120
-      lore:
-         - "&7Click to buy"
    mineshaft:
-      slot: 12
-      title: "&a&lMINESHAFT"
-      material: "EMERALD_ORE"
       prices:
          - 600
          - 700
@@ -55,12 +68,7 @@ buildings:
          - 195
          - 280
          - 310
-      lore:
-         - "&7Click to buy"
    farmcrate:
-      slot: 14
-      title: "&e&lFARMCRATE"
-      material: "HAY_BLOCK"
       prices:
          - 40
          - 60
@@ -83,5 +91,3 @@ buildings:
          - 20
          - 25
          - 29
-      lore:
-         - "&7Click to buy"

@@ -100,6 +100,26 @@ public class FileManager {
         String schematicPath = "schematics" + File.separator;
 
         if (!tycoonFile.exists()) {
+            List<String> schematicsToCopy = Arrays.asList(
+                    "tycoon1.schem",
+                    "tycoon2.schem",
+                    "tycoon3.schem",
+                    "tycoon1farm.schem",
+                    "tycoon1mineshaft.schem",
+                    "sawmill1.schem",
+                    "sawmill2.schem",
+                    "sawmill3.schem",
+                    "sawmill4.schem",
+                    "sawmill5.schem",
+                    "sawmill6.schem",
+                    "sawmill7.schem",
+                    "sawmill8.schem",
+                    "sawmill9.schem",
+                    "sawmill.schem",
+                    "sawmillplaceholder.schem"
+
+            );
+
             plugin.saveResource(schematicPath + "tycoon1.schem", true);
             plugin.saveResource(schematicPath + "tycoon2.schem", false);
             plugin.saveResource(schematicPath + "tycoon3.schem", false);

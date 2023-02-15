@@ -4,11 +4,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import pw.arx.tycoonplugin.commands.Admin;
-import pw.arx.tycoonplugin.commands.Delete;
-import pw.arx.tycoonplugin.commands.Reload;
-import pw.arx.tycoonplugin.commands.Tool;
-import pw.arx.tycoonplugin.utils.PlayerUtils;
+import pw.arx.tycoonplugin.commandhandlers.AdminCommandHandler;
+import pw.arx.tycoonplugin.commandhandlers.DeleteCommandHandler;
+import pw.arx.tycoonplugin.commandhandlers.ReloadCommandHandler;
+import pw.arx.tycoonplugin.commandhandlers.ToolCommandHandler;
 import pw.arx.tycoonplugin.utils.StringUtils;
 
 public class CommandListener implements CommandExecutor {
@@ -31,23 +30,27 @@ public class CommandListener implements CommandExecutor {
 		Player p = (Player) sender;
 		
 		if(args[0].equalsIgnoreCase("create") || args[0].equalsIgnoreCase("tool")) {
-			return Tool.Creator(p);
+			return ToolCommandHandler.Creator(p);
 		}
 		
 		if(args[0].equalsIgnoreCase("delete")) {
-			return Delete.Command(p);
+			return DeleteCommandHandler.handle(p);
 		}
 		
 		if (args[0].equalsIgnoreCase("reload")) {
-			return Reload.Command(p);
+			return ReloadCommandHandler.handle(p);
 		}
-		
+
+		if(args[0].equalsIgnoreCase("machines")) {
+			return ToolCommandHandler.Builder(p);
+		}
+
 		if(args[0].equalsIgnoreCase("build")) {
-			return Tool.Builder(p);
+			return ToolCommandHandler.Builder(p);
 		}
 		
 		if(args[0].equalsIgnoreCase("admin")) {
-			return Admin.Command(p);
+			return AdminCommandHandler.handle(p);
 		}
 		
 		p.sendMessage(StringUtils.lng("INVALID_COMMAND"));

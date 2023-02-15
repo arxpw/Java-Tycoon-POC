@@ -12,7 +12,6 @@ import pw.arx.tycoonplugin.Tycoon;
 import pw.arx.tycoonplugin.managers.FileManager.Config;
 import pw.arx.tycoonplugin.utils.*;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +95,7 @@ public class BuildingManager {
 			}
 			
 			p.sendMessage(StringUtils.c("&7" + BUILDING_LINES.get(0).toString() + " &7Upgraded to &eLevel " + NEXT_LEVEL));
-			p.openInventory(MenuUtils.buildingUpgrader(building, p));
+			p.openInventory(MenuUtils.getBuildingUpgraderInventory(building, p));
 			
 			BlockUtils.loadHolograms();
 			

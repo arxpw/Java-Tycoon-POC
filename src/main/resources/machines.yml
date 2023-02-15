@@ -1,0 +1,61 @@
+title: "DEBUG Machine Selection"
+
+menu_items:
+   sawmill:
+      slot: 10
+      title: "&a&lSawmill Tier 1"
+      material: "STONECUTTER"
+      lore:
+         - "&7Click to purchase"
+   farm:
+      slot: 12
+      title: "&a&lFarm Tier 1"
+      material: "HAYBALE"
+      disabled: true
+      lore:
+         - "&cCannot currently purchase"
+   furnace:
+      slot: 14
+      title: "&a&lFurnace Tier 1"
+      material: "FURNACE"
+      disabled: true
+      lore:
+         - "&cCannot currently purchase"
+
+machines:
+   sawmill:
+      price: 5
+      schematic: "sawmill.schem"
+      placeholder: "sawmillplaceholder.schem"
+      animation:
+         - "sawmill1.schem"
+         - "sawmill2.schem"
+         - "sawmill3.schem"
+         - "sawmill4.schem"
+         - "sawmill5.schem"
+         - "sawmill6.schem"
+         - "sawmill7.schem"
+         - "sawmill8.schem"
+         - "sawmill9.schem"
+      variants:
+         - "OAK_LOG"
+         - "DARK_OAK_LOG"
+         - "BIRCH_LOG"
+         - "MANGROVE_LOG"
+         - "JUNGLE_LOG"
+         - "ACACIA_LOG"
+         - "BIRCH_LOG"
+   farm:
+      slot: 12
+      disabled: true
+      price: 5
+      lore:
+         - "&cCannot currently purchase"
+   furnace:
+      slot: 14
+      title: "&a&lFurnace Tier 1"
+      material: "FURNACE"
+      disabled: true
+      price: 5
+      lore:
+         - "&cCannot currently purchase"

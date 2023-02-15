@@ -8,6 +8,7 @@ COMMANDS_TITLE: "&e&lTycoon"
 NO_CONSOLE: "You must be a player to run this command"
 COMMANDS:
 - "/tycoon &etool &7- Enable and disable your tycoon builder tool."
+- "/tycoon &emachines &7- Get your machines!"
 - "/tycoon &ebuild &7- Build tycoon structures."
 - "/tycoon &eprestige&7- Prestige your tycoon."
 - "/tycoon &edelete&7- Delete your tycoon."
