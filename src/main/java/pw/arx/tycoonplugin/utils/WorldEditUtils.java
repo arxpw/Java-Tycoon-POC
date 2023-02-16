@@ -65,7 +65,6 @@ public class WorldEditUtils {
 	}
 	
 	public static void regionCreate(Location l, Player p) {
-		p.sendMessage("Attempting to create a WG region for you..");
 		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
 		
 		ArrayList<Location> REGION_ARRAY = LocUtils.selectOffset(l, Tycoon.SEL_OFFSET);

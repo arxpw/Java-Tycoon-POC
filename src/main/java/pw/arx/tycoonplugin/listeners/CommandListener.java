@@ -4,57 +4,81 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import pw.arx.tycoonplugin.commandhandlers.AdminCommandHandler;
-import pw.arx.tycoonplugin.commandhandlers.DeleteCommandHandler;
-import pw.arx.tycoonplugin.commandhandlers.ReloadCommandHandler;
-import pw.arx.tycoonplugin.commandhandlers.ToolCommandHandler;
+import pw.arx.tycoonplugin.commandhandlers.*;
 import pw.arx.tycoonplugin.utils.StringUtils;
 
 public class CommandListener implements CommandExecutor {
 
+	private CommandSender sender;
+	private String command;
+	private Player player;
+
+	private boolean isCommand(String commandToCheck)
+	{
+		return command.equalsIgnoreCase(commandToCheck);
+	}
+
+	private void displayCommandHelp()
+	{
+		sender.sendMessage(StringUtils.lng("COMMANDS_TITLE"));
+		sender.sendMessage(StringUtils.lng("COMMANDS"));
+	}
+
+	private void displayNoConsoleError()
+	{
+		sender.sendMessage(StringUtils.lng("NO_CONSOLE"));
+	}
+
+	private void displayInvalidCommandError()
+	{
+		sender.sendMessage(StringUtils.lng("INVALID_COMMAND"));
+	}
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) {
+		this.sender = sender;
 
 		if (args.length == 0) {
-			sender.sendMessage(StringUtils.lng("COMMANDS_TITLE"));
-			sender.sendMessage(StringUtils.lng("COMMANDS"));
+			displayCommandHelp();
 			return false;
 		}
 		
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(StringUtils.lng("NO_CONSOLE"));
+			displayNoConsoleError();
 			return false;
 		}
 		
-		// we know this is a player..
+		// we now know this is a player
 		Player p = (Player) sender;
-		
-		if(args[0].equalsIgnoreCase("create") || args[0].equalsIgnoreCase("tool")) {
-			return ToolCommandHandler.Creator(p);
-		}
-		
-		if(args[0].equalsIgnoreCase("delete")) {
-			return DeleteCommandHandler.handle(p);
-		}
-		
-		if (args[0].equalsIgnoreCase("reload")) {
-			return ReloadCommandHandler.handle(p);
+
+		this.player = p;
+		this.command = args[0];
+
+		if (isCommand("tool")) {
+			return ToolBuildCommandHandler.Handle(p);
 		}
 
-		if(args[0].equalsIgnoreCase("machines")) {
-			return ToolCommandHandler.Builder(p);
+		if (isCommand("build")) {
+			return ToolCreateCommandHandler.Handle(p);
+		}
+		
+		if (isCommand("delete")) {
+			return DeleteCommandHandler.Handle(p);
+		}
+		
+		if (isCommand("reload")) {
+			return ReloadCommandHandler.Handle(p);
 		}
 
-		if(args[0].equalsIgnoreCase("build")) {
-			return ToolCommandHandler.Builder(p);
+		if (isCommand("machines")) {
+			return MachineCommandHandler.Handle(p);
 		}
 		
-		if(args[0].equalsIgnoreCase("admin")) {
-			return AdminCommandHandler.handle(p);
+		if (isCommand("admin")) {
+			return AdminCommandHandler.Handle(p);
 		}
-		
-		p.sendMessage(StringUtils.lng("INVALID_COMMAND"));
-		return true;
-		
+
+		displayInvalidCommandError();
+		return false;
 	}
 }

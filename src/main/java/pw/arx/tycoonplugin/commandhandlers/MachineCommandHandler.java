@@ -10,7 +10,7 @@ import pw.arx.tycoonplugin.utils.StringUtils;
 import java.io.FileNotFoundException;
 
 public class MachineCommandHandler implements CommandHandler {
-	public static Boolean handle(Player p) {
+	public static Boolean Handle(Player p) {
 		p.openInventory(MenuUtils.LoadBuildingsMenu(p));
     	if (!Tycoon.SELECTION_LOCATIONS.containsKey(p.getUniqueId())) {
     		p.sendMessage(StringUtils.c("&cYou have to make a selection first! &f/tycoon tool"));

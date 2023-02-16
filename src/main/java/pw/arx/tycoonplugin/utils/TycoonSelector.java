@@ -12,47 +12,39 @@ import java.util.ArrayList;
 public class TycoonSelector {
 	private TycoonSelector() { }
 	
-	public static ArrayList<Location> selectOffset(Location l, Integer BOX_OFFSET) {
-		ArrayList<Location> RETURNLOC = new ArrayList<Location>();
-			
-		RETURNLOC.add(new Location(l.getWorld(), l.getX() + BOX_OFFSET, l.getY(), l.getZ() + BOX_OFFSET));
-		RETURNLOC.add(new Location(l.getWorld(), l.getX() - BOX_OFFSET, l.getY(), l.getZ() - BOX_OFFSET));
-		
-		return RETURNLOC;
-	}
-	
-	public static boolean ClearSelection(Player p) {
-		if(Tycoon.TOOLS_ENABLED.containsKey(p.getUniqueId())) {
-        	ArrayList<Location> locarray = LocUtils.selectOffset(Tycoon.SELECTION_LOCATIONS.get(p.getUniqueId()), Tycoon.SEL_OFFSET);
-            BlockUtils.blockUpdate(locarray.get(0), locarray.get(1), p);
-			Tycoon.SELECTION_LOCATIONS.remove(p.getUniqueId());
-			return true;
-		} else {
+	public static boolean ClearSelection(Player p)
+	{
+		if (!Tycoon.TOOLS_ENABLED.containsKey(p.getUniqueId())) {
 			return false;
 		}
+
+		ArrayList<Location> selectionLocations = LocUtils.selectOffset(Tycoon.SELECTION_LOCATIONS.get(p.getUniqueId()), Tycoon.SEL_OFFSET);
+		BlockUtils.blockUpdate(selectionLocations.get(0), selectionLocations.get(1), p);
+		Tycoon.SELECTION_LOCATIONS.remove(p.getUniqueId());
+
+		return true;
 	}
 	
-	public static void SelectBlocks(Player p) {
-		Block tblock = BlockUtils.targetBlock(p);
+	public static void SelectBlocks(Player p)
+	{
+		Block targetBlock = BlockUtils.targetBlock(p);
 		
-		if(!Tycoon.TOOLS_ENABLED.containsKey(p.getUniqueId()))
+		if (!Tycoon.TOOLS_ENABLED.containsKey(p.getUniqueId())) {
 			Tycoon.TOOLS_ENABLED.put(p.getUniqueId(), true);
+		}
 			
-        Tycoon.SELECTION_LOCATIONS.put(p.getUniqueId(), tblock.getLocation());
+        Tycoon.SELECTION_LOCATIONS.put(p.getUniqueId(), targetBlock.getLocation());
         
 		// + FAKE UPDATE BLOCKS...
-        ArrayList<Location> NEW_LOC = LocUtils.selectOffset(tblock.getLocation(), Tycoon.SEL_OFFSET);
-        BlockUtils.blockFillFakes(p, NEW_LOC.get(0), NEW_LOC.get(1), tblock.getLocation());
-        
-        
+        ArrayList<Location> newLocations = LocUtils.selectOffset(targetBlock.getLocation(), Tycoon.SEL_OFFSET);
+        BlockUtils.blockFillFakes(p, newLocations.get(0), newLocations.get(1), targetBlock.getLocation());
+
     	Bukkit.getScheduler().scheduleSyncDelayedTask(Tycoon.getPlugin(), new Runnable() {
             public void run() {
-            	p.sendBlockChange(tblock.getLocation(), Material.GOLD_BLOCK.createBlockData());
+            	p.sendBlockChange(targetBlock.getLocation(), Material.GOLD_BLOCK.createBlockData());
             }
         }, 3);
-        
-        
+
         p.sendMessage(StringUtils.lng("LAND_VALID_SELECT"));
 	}
-	
 }
